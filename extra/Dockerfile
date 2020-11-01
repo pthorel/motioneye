@@ -18,7 +18,7 @@ ARG RUN_GID=0
 
 COPY . /tmp/motioneye
 
-RUN echo "deb http://snapshot.debian.org/archive/debian/$(date +%Y%m%d) sid main contrib non-free" >>/etc/apt/sources.list && \
+RUN echo "deb http://deb.debian.org/debian/ sid main contrib non-free" >>/etc/apt/sources.list && \
     apt-get update && \
     DEBIAN_FRONTEND="noninteractive" apt-get -t stable --yes --option Dpkg::Options::="--force-confnew" --no-install-recommends install \
       curl \
@@ -36,8 +36,11 @@ RUN echo "deb http://snapshot.debian.org/archive/debian/$(date +%Y%m%d) sid main
       python-tornado \
       python-tz \
       python-wheel \
-      v4l-utils && \
-    DEBIAN_FRONTEND="noninteractive" apt-get -t sid --yes --option Dpkg::Options::="--force-confnew" --no-install-recommends install \
+      v4l-utils
+
+RUN DEBIAN_FRONTEND="noninteractive" apt-get -t sid --yes --option Dpkg::Options::="--force-confnew" --no-install-recommends install --only-upgrade \
+      apt && \
+    DEBIAN_FRONTEND="noninteractive" apt-get -t sid --yes --option Dpkg::Options::="--force-confnew" -o APT::Immediate-Configure=0 --no-install-recommends install \
       motion \
       libmysqlclient20 && \
     # Change uid/gid of user/group motion to match our desired IDs.  This will
